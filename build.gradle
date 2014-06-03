@@ -12,6 +12,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
+apply plugin: 'scala'
 
 jar {
     baseName = 'battleship-spring'
@@ -26,10 +27,19 @@ repositories {
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-web:1.0.0.RC1"
     compile "org.thymeleaf:thymeleaf-spring4:2.1.2.RELEASE"
+    compile "org.scala-lang:scala-library:2.11.1"
+    testCompile "org.springframework:spring-test:4.0.0.RELEASE"
     testCompile "org.mockito:mockito-all:1.9.5"
     testCompile "junit:junit:4.10"
+    testCompile "org.scala-lang:scala-library:2.11.1"
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '1.8'
 }
+
+sourceSets.main.scala.srcDir "src/main/java"
+sourceSets.main.java.srcDirs = []
+
+sourceSets.test.scala.srcDir "src/test/java"
+sourceSets.test.java.srcDirs = []

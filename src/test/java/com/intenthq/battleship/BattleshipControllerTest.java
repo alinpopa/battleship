@@ -10,6 +10,7 @@ import static org.junit.Assert.assertThat;
 
 public class BattleshipControllerTest
 {
+
 	private static final String SOME_INPUT = "input";
 	private static final String SAMPLE_INPUT = "(5, 5)\n" +
 			"(1, 2, N) (3, 3, E)\n" +
@@ -27,7 +28,7 @@ public class BattleshipControllerTest
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		battleshipController = new BattleshipController();
+		battleshipController = new BattleshipController(battleShipService());
 	}
 
 	@Test
@@ -60,4 +61,13 @@ public class BattleshipControllerTest
 		final String output = (String) model.get(BattleshipController.OUTPUT_ATT);
 		assertThat(output, is(SAMPLE_OUTPUT));
 	}
+
+    private BattleShipService battleShipService(){
+        return new BattleShipService(){
+            @Override
+            public String name(){
+                return "test";
+            }
+        };
+    }
 }
