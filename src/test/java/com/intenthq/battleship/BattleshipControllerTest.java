@@ -28,7 +28,7 @@ public class BattleshipControllerTest
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		battleshipController = new BattleshipController(battleShipService());
+		battleshipController = new BattleshipController();
 	}
 
 	@Test
@@ -61,13 +61,4 @@ public class BattleshipControllerTest
 		final String output = (String) model.get(BattleshipController.OUTPUT_ATT);
 		assertThat(output, is(SAMPLE_OUTPUT));
 	}
-
-    private BattleShipService battleShipService(){
-        return new BattleShipService(){
-            @Override
-            public String name(){
-                return "test";
-            }
-        };
-    }
 }
