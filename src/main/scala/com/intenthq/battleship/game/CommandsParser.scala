@@ -1,5 +1,5 @@
 package com.intenthq.battleship.game
 
-trait ComandsParser {
+trait CommandsParser {
   def parse(input: String): Gameplay
 }

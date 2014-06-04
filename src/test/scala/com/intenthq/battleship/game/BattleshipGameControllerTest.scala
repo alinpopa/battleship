@@ -34,7 +34,9 @@ class BattleshipGameControllerTest extends FlatSpec with Matchers with MockFacto
   }
 
   it should "return output when there is an input" in {
-    val battleshipController = new BattleshipGameController(mock[GameService])
+    val gameService = mock[GameService]
+    (gameService.execute _).expects(sampleInput).returning("test output")
+    val battleshipController = new BattleshipGameController(gameService)
     val model = new ModelMap
     battleshipController.exercise(sampleInput, model)
 
@@ -42,11 +44,24 @@ class BattleshipGameControllerTest extends FlatSpec with Matchers with MockFacto
   }
 
   it should "return sample output for sample input" in {
-    val battleshipController = new BattleshipGameController(mock[GameService])
+    val gameService = mock[GameService]
+    (gameService.execute _).expects(sampleInput).returning(sampleOutput)
+    val battleshipController = new BattleshipGameController(gameService)
     val model = new ModelMap
     battleshipController.exercise(sampleInput, model)
     val output = model.get("output").asInstanceOf[String]
 
     output should be (sampleOutput)
+  }
+
+  it should "return an error message when parsing exception is thrown" in {
+    val gameService = mock[GameService]
+    (gameService.execute _).expects(sampleInput).throwing(new ParsingException("test message"))
+    val battleshipController = new BattleshipGameController(gameService)
+    val model = new ModelMap
+    battleshipController.exercise(sampleInput, model)
+    val output = model.get("errors").asInstanceOf[String]
+
+    output should be ("test message")
   }
 }

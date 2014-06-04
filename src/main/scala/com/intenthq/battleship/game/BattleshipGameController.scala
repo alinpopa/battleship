@@ -19,7 +19,11 @@ class BattleshipGameController @Autowired() (gameService: GameService) {
   @RequestMapping(Array("/battleship/exercise"))
   def exercise(@RequestParam(value = "input", required = false) input: String, model: ModelMap): String = {
     if (!StringUtils.isEmpty(input)) {
-      model.addAttribute(outputAtt, "(1, 3, N) SUNK\n(4, 1, E)")
+      try {
+        model.addAttribute(outputAtt, gameService.execute(input))
+      }catch{
+        case e: Exception => model.addAttribute("errors", e.getMessage)
+      }
     }
     "exercise"
   }

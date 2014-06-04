@@ -42,6 +42,22 @@ class ParenthesesCommandsParserTest extends FlatSpec with Matchers {
     parenthesesCommandsParser.parse(gameplay) should be (expectedResult)
   }
 
+  it should "parse a gameplay by trimming the commands" in {
+    val parenthesesCommandsParser = new ParenthesesCommandsParser
+    val gameplay = """  (5, 6)
+                      (3, 4, N) (2, 5, E)
+                      (3, 3) LMLM"""
+    val expectedResult = Gameplay(
+      InitBoard(5, 6),
+      InitShips(List(Ship(Position(3, 4), North), Ship(Position(2, 5), East))),
+      List(
+        MoveShip(Position(3, 3), List(Left, Move, Left, Move))
+      )
+    )
+
+    parenthesesCommandsParser.parse(gameplay) should be (expectedResult)
+  }
+
   it should "fail parsing when the gameplay is missing all the commands" in {
     val parenthesesCommandsParser = new ParenthesesCommandsParser
     val gameplay = "(5, 6)\n(4, 2, N) (5, 3, E)"
@@ -92,6 +108,15 @@ class ParenthesesCommandsParserTest extends FlatSpec with Matchers {
     val gameplay = "(5, 6)\n(2, 3, N) (3, 4, E) (2, 3, E)\n(5, 6)\n(3, 3) LML"
 
     an [PositioningException] should be thrownBy {
+      parenthesesCommandsParser.parse(gameplay)
+    }
+  }
+
+  it should "fail parsing when giving invalid positioning for the ships setup" in {
+    val parenthesesCommandsParser = new ParenthesesCommandsParser
+    val gameplay = "(5, 6)\n(1, 3, N) (2, 0, E)\n(5, 6)\n(3, 3) LML"
+
+    an [InvalidPositionException] should be thrownBy {
       parenthesesCommandsParser.parse(gameplay)
     }
   }

@@ -1,10 +1,30 @@
 package com.intenthq.battleship.game
 
-sealed trait Orientation
-case object North extends Orientation
-case object South extends Orientation
-case object East extends Orientation
-case object West extends Orientation
+sealed trait Orientation {
+  def left: Orientation
+  def right: Orientation
+  def shortName: String
+}
+case object North extends Orientation {
+  override def left = West
+  override def right = East
+  override def shortName = "N"
+}
+case object South extends Orientation {
+  override def left = East
+  override def right = West
+  override def shortName = "S"
+}
+case object East extends Orientation {
+  override def left = North
+  override def right = South
+  override def shortName = "E"
+}
+case object West extends Orientation {
+  override def left = South
+  override def right = North
+  override def shortName = "W"
+}
 object Orientation {
   def apply(orientation: String): Orientation = orientation match {
     case "N" => North
@@ -36,6 +56,15 @@ case class Ship(position: Position, orientation: Orientation, state: ShipState) 
   def sink = state match {
     case Sunk => this
     case _ => Ship(position, orientation, Sunk)
+  }
+  def move = state match {
+    case Sunk => this
+    case Floating => orientation match {
+      case East => Ship(Position(position.x + 1, position.y), orientation, state)
+      case West => Ship(Position(position.x - 1, position.y), orientation, state)
+      case North => Ship(Position(position.x, position.y + 1), orientation, state)
+      case South => Ship(Position(position.x, position.y - 1), orientation, state)
+    }
   }
 }
 object Ship {

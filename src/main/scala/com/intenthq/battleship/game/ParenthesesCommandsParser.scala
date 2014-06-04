@@ -1,16 +1,19 @@
 package com.intenthq.battleship.game
 
 import scala.util.Try
+import org.springframework.stereotype.Component
 
-class ParenthesesCommandsParser extends ComandsParser{
+@Component
+class ParenthesesCommandsParser extends CommandsParser{
   private val positionCommand = """\((\d+),\s(\d+)\)""".r
   private val initShipsCommand = """\((\d+),\s(\d+),\s([NWSE])\)""".r
   private val movementsCommand = """\((\d+),\s(\d+)\)\s([RLM]+)""".r
-  private val commandsSplitter = """\n"""
+  private val commandsSplitter = "\n"
   private val movementsSplitter = """(?=\()"""
 
   override def parse(input: String): Gameplay = {
     val gameplay = input.split(commandsSplitter)
+
     if (gameplay.size <= 2)
       throw new ParsingException("wrong gameplay format")
     else
@@ -26,7 +29,7 @@ class ParenthesesCommandsParser extends ComandsParser{
 
   private def parseInitialBoard(initialBoard: String): InitBoard = {
     try {
-      val positionCommand(initX, initY) = initialBoard
+      val positionCommand(initX, initY) = initialBoard.trim
       InitBoard(initX.toInt, initY.toInt)
     } catch {
       case _:MatchError => throw new ParsingException(s"wrong format for the initial board command: $initialBoard")
@@ -75,7 +78,8 @@ class ParenthesesCommandsParser extends ComandsParser{
   private def validate(gameplay: Gameplay): Gameplay = {
     List(validateInitShipsPosition,
          validateActionsPosition,
-         validateSamePositionShips).foldLeft(gameplay){
+         validateSamePositionShips,
+         validateWrongPositions).foldLeft(gameplay){
       (gameplay, validation) =>
         validation(gameplay)
     }
@@ -85,7 +89,7 @@ class ParenthesesCommandsParser extends ComandsParser{
     gameplay.initShips.ships.foreach{
       ship =>
         if(ship.position.x > gameplay.initBoard.rows || ship.position.y > gameplay.initBoard.cols)
-          throw new PositioningException(s"Ship position is off the board: $ship")
+          throw new PositioningException(s"Ship position is off the board: (${ship.position.x}, ${ship.position.y})")
     }
     gameplay
   }
@@ -94,7 +98,7 @@ class ParenthesesCommandsParser extends ComandsParser{
     gameplay.actions.foreach{
       action =>
         if(action.position.x > gameplay.initBoard.rows || action.position.y > gameplay.initBoard.cols)
-          throw new PositioningException(s"Action position is off the board: $action")
+          throw new PositioningException(s"Action position is off the board: (${action.position.x}, ${action.position.y})")
     }
     gameplay
   }
@@ -103,6 +107,15 @@ class ParenthesesCommandsParser extends ComandsParser{
     val positions = gameplay.initShips.ships.map(_.position)
     if(positions.distinct.size != positions.size)
       throw new PositioningException("Multiple ships on the same position")
+    gameplay
+  }
+
+  private val validateWrongPositions: Gameplay => Gameplay = (gameplay) => {
+    gameplay.initShips.ships.foreach{
+      ship =>
+        if(ship.position.x == 0 || ship.position.y == 0)
+          throw new InvalidPositionException(s"Invalid ship position (${ship.position.x}, ${ship.position.y})")
+    }
     gameplay
   }
 }
