@@ -58,4 +58,6 @@ case class Board(rows: Int, cols: Int, ships: List[Ship]) {
   def this(rows: Int, cols: Int) = this(rows, cols, List.empty[Ship])
 }
 
-case class Gameplay(initBoard: InitBoard, initShips: InitShips, actions: List[Action])
+case class Gameplay(initBoard: InitBoard, initShips: InitShips, actions: List[Action]){
+  def createBoard = Board(initBoard.rows, initBoard.cols, initShips.ships)
+}
