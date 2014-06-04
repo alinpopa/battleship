@@ -15,3 +15,5 @@
 *.war
 *.pyc
 build
+out/
+
