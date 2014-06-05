@@ -10,21 +10,18 @@ class FailfastGameplayRunner extends GameplayRunner{
   }
 
   private def actionRunner(action: Action, board: Board): Board = {
-    val ships = board.ships.map{
-      ship =>
-        if(ship.position == action.position){
-          action match {
-            case MoveShip(_, movements) => validate(board, transition(ship, movements))
-            case Shoot(_) => ship.sink
-          }
-        }
-        else ship
-    }
+    val ships = board.ships.map(ship => applyAction(board, ship, action))
     Board(board.rows, board.cols, ships)
   }
 
-  private def findShip(board: Board, position: Position): Option[Ship] = {
-    board.ships.find(_.position == position)
+  private def applyAction(board: Board, ship: Ship, action: Action): Ship = {
+    if(ship.position == action.position){
+      action match {
+        case MoveShip(_, movements) => validate(board, transition(ship, movements))
+        case Shoot(_) => ship.sink
+      }
+    }
+    else ship
   }
 
   private def transition(ship: Ship, movements: List[Movement]): Ship = {
@@ -35,13 +32,6 @@ class FailfastGameplayRunner extends GameplayRunner{
           case Left => Ship(ship.position, ship.orientation.left, ship.state)
           case Right => Ship(ship.position, ship.orientation.right, ship.state)
         }
-    }
-  }
-
-  private def applyAction(ship: Ship, action: Action): Ship = {
-    action match {
-      case MoveShip(_, movements) => transition(ship, movements)
-      case Shoot(_) => ship.sink
     }
   }
 
