@@ -55,14 +55,10 @@ class FailfastGameplayRunner extends GameplayRunner{
   }
 
   private def validate(board: Board, ship: Ship): Ship = {
-    val validators = List(
+    val validator = List(
       (ship: Ship) => validatePositionOnBoard(board, ship),
       (ship: Ship) => validateConflictPosition(board, ship)
-    )
-    validators.foldLeft(ship){
-      (ship, shipValidator) =>
-        shipValidator(ship)
-    }
+    ).reduceLeft(_.andThen(_))
+    validator(ship)
   }
-
 }
